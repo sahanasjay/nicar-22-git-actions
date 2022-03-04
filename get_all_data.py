@@ -1,5 +1,5 @@
 import pandas as pd # importing pandas lib for data manipulation + analysis 
-from pathlib import path # path library works with filepaths 
+from pathlib import Path # path library works with filepaths 
 
 # read a csv (from padas lib) 
 df_current = pd.read_csv('usgs_current.csv')
