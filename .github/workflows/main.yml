@@ -1,0 +1,42 @@
+# name of your action 
+name: Scrape latest data
+
+# when to run this action 
+# currently set to push
+# also set to <workflow-dispatch> -> will allow us to manually execute the file, so we can test 
+# schedule keyword, tells gtihub to run this on a particular schedule 
+# uses a cron tab - a computer's way of understanding time. 
+# use [crontab guru](https://crontab.guru) to convert human time to cron time  
+# our cron expression means run this every five minutes 
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron:  '*/5 * * * *'
+
+# tell github what to run an action on
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    # now tell github what to actually do 
+    steps:
+    # Step 1: Prepare the environment
+    - name: Check out this repo
+    # clones your repo on a cloud computer and runs your action there 
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    # Step 2: Get the latest data and store it as a CSV
+    - name: Fetch latest data
+      run: |-        
+        curl "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.csv" -o usgs_current.csv
+    # Step 3: Commit and push
+    - name: Commit and push
+      run: |-
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add -A
+        timestamp=$(date -u)
+        git commit -m "Latest data: ${timestamp}" || exit 0
+        git push
+  # yaml is very particular about indentation, just like python 
